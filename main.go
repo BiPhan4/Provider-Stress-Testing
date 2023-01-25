@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 )
 
 // https://storagep1.chainstrategies.cloud/upload
@@ -23,7 +22,7 @@ func main() {
 
 	for {
 		// Create a new text file
-		file, err := os.Create("files2" + strconv.Itoa(fileCounter) + ".txt")
+		file, err := os.Create("files3" + strconv.Itoa(fileCounter) + ".txt")
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -32,7 +31,7 @@ func main() {
 
 		// Write some text to the file
 
-		fileContents := fmt.Sprintf("This is an files2 text file for file No. %d", fileCounter)
+		fileContents := fmt.Sprintf("This is an files3 text file for file No. %d", fileCounter)
 
 		_, err = file.WriteString(fileContents)
 		if err != nil {
@@ -40,7 +39,7 @@ func main() {
 			return
 		}
 
-		filename := "files2" + strconv.Itoa(fileCounter) + ".txt"
+		filename := "files3" + strconv.Itoa(fileCounter) + ".txt"
 		cid, err := postFile(filename, target_url)
 		if err != nil {
 			fmt.Println(err)
@@ -50,7 +49,7 @@ func main() {
 
 		fileCounter++
 
-		time.Sleep(1 * time.Second)
+		// time.Sleep(1 * time.Second)
 
 	}
 }
