@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 // https://storagep1.chainstrategies.cloud/upload
@@ -39,19 +40,24 @@ func main() {
 			return
 		}
 
-		filename := "files3" + strconv.Itoa(fileCounter) + ".txt"
-		cid, err := postFile(filename, target_url)
-		if err != nil {
-			fmt.Println(err)
-			return
+		for i := 0; i < 20; i++ {
+			filename := "files3" + strconv.Itoa(fileCounter) + ".txt"
+			go wrapFile(filename, target_url)
+			fileCounter++
 		}
-		fmt.Printf("The CID is %s", cid)
 
-		fileCounter++
-
-		// time.Sleep(1 * time.Second)
+		time.Sleep(30 * time.Second)
 
 	}
+}
+
+func wrapFile(filename string, targetUrl string) {
+	cid, err := postFile(filename, targetUrl)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("The CID is %s", cid)
 }
 
 func postFile(filename string, targetUrl string) (string, error) {
