@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"github.com/JackalLabs/jackal-provider/jprov/crypto"
+	"github.com/BiPhan4/Provider-Stress-Testing/crypto"
 	"github.com/cosmos/cosmos-sdk/client"
 	txns "github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
