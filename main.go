@@ -22,25 +22,26 @@ func main() {
 	var fileCounter int
 
 	for {
-		// Create a new text file
-		file, err := os.Create("files3" + strconv.Itoa(fileCounter) + ".txt")
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		defer file.Close()
-
-		// Write some text to the file
-
-		fileContents := fmt.Sprintf("This is an files3 text file for file No. %d", fileCounter)
-
-		_, err = file.WriteString(fileContents)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
 
 		for i := 0; i < 20; i++ {
+			// Create a new text file
+			file, err := os.Create("files3" + strconv.Itoa(fileCounter) + ".txt")
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			defer file.Close()
+
+			// Write some text to the file
+
+			fileContents := fmt.Sprintf("This is an files3 text file for file No. %d", fileCounter)
+
+			_, err = file.WriteString(fileContents)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
 			filename := "files3" + strconv.Itoa(fileCounter) + ".txt"
 			go wrapFile(filename, target_url)
 			fileCounter++
