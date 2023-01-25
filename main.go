@@ -41,7 +41,12 @@ func main() {
 		}
 
 		filename := "Examples" + strconv.Itoa(fileCounter) + ".txt"
-		postFile(filename, target_url)
+		cid, err := postFile(filename, target_url)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Printf("The CID is %s", cid)
 
 		fileCounter++
 
@@ -50,61 +55,74 @@ func main() {
 	}
 }
 
-func postFile(filename string, targetUrl string) error {
+func postFile(filename string, targetUrl string) (string, error) {
 	bodyBuf := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuf)
 
 	// this step is very important
 	fileWriter, err := bodyWriter.CreateFormFile("file", filename)
 	if err != nil {
-		fmt.Println("error writing to buffer")
-		return err
+		//fmt.Println("error writing to buffer")
+		return "", err
 	}
 	// I need to pass in a sender mang lol
 	// open file handle
 	fh, err := os.Open(filename)
 	if err != nil {
-		fmt.Println("error opening file")
-		return err
+		//fmt.Println("error opening file")
+		return "", err
 	}
-	defer fh.Close()
 
 	// iocopy
 	_, err = io.Copy(fileWriter, fh)
 	if err != nil {
-		fmt.Println("error copying")
-		return err
+		//fmt.Println("error copying")
+		return "", err
+	}
+
+	err = fh.Close()
+	if err != nil {
+		return "", err
 	}
 	// Below might need to change - we can look at how HTML does it to replicate it
-	bodyWriter.WriteField("sender", "jkl10k05lmc88q5ft3lm00q30qkd9x6654h3lejnct")
+	err = bodyWriter.WriteField("sender", "jkl10k05lmc88q5ft3lm00q30qkd9x6654h3lejnct")
+	if err != nil {
+		return "", err
+	}
 	contentType := bodyWriter.FormDataContentType()
-	bodyWriter.Close()
-
+	err = bodyWriter.Close()
+	if err != nil {
+		return "", err
+	}
 	resp, err := http.Post(targetUrl, contentType, bodyBuf)
 	if err != nil {
-		fmt.Println("Post request from main.go failed.")
-		fmt.Println(err)
-		return err
+		//fmt.Println("Post request from main.go failed.")
+		//fmt.Println(err)
+		return "", err
 	}
-	defer resp.Body.Close()
-	resp_body, err := ioutil.ReadAll(resp.Body)
+	err = resp.Body.Close()
 	if err != nil {
-		return err
+		return "", err
+	}
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
 	}
 	fmt.Println(resp.Status)
-	fmt.Println(string(resp_body))
+	fmt.Println(string(respBody))
 
 	var data UploadResponse
 
-	err = json.Unmarshal(resp_body, &data)
+	err = json.Unmarshal(respBody, &data)
 	if err != nil {
-		fmt.Println(err)
+		//fmt.Println(err)
+		return "", err
 	}
 
 	// Access the fields of the struct
-	fmt.Printf("The CID is %s", data.CID)
+	//fmt.Printf("The CID is %s", data.CID)
 
-	return nil
+	return data.CID, nil
 }
 
 type UploadResponse struct {
