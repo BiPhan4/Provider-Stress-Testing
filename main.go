@@ -23,7 +23,7 @@ func main() {
 
 	for {
 		// Create a new text file
-		file, err := os.Create("Examples" + strconv.Itoa(fileCounter) + ".txt")
+		file, err := os.Create("files2" + strconv.Itoa(fileCounter) + ".txt")
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -32,7 +32,7 @@ func main() {
 
 		// Write some text to the file
 
-		fileContents := fmt.Sprintf("This is an Examples text file for file No. %d", fileCounter)
+		fileContents := fmt.Sprintf("This is an files2 text file for file No. %d", fileCounter)
 
 		_, err = file.WriteString(fileContents)
 		if err != nil {
@@ -40,7 +40,7 @@ func main() {
 			return
 		}
 
-		filename := "Examples" + strconv.Itoa(fileCounter) + ".txt"
+		filename := "files2" + strconv.Itoa(fileCounter) + ".txt"
 		cid, err := postFile(filename, target_url)
 		if err != nil {
 			fmt.Println(err)
@@ -50,7 +50,7 @@ func main() {
 
 		fileCounter++
 
-		time.Sleep(4 * time.Second)
+		time.Sleep(1 * time.Second)
 
 	}
 }
@@ -62,21 +62,21 @@ func postFile(filename string, targetUrl string) (string, error) {
 	// this step is very important
 	fileWriter, err := bodyWriter.CreateFormFile("file", filename)
 	if err != nil {
-		//fmt.Println("error writing to buffer")
+		// fmt.Println("error writing to buffer")
 		return "", err
 	}
 	// I need to pass in a sender mang lol
 	// open file handle
 	fh, err := os.Open(filename)
 	if err != nil {
-		//fmt.Println("error opening file")
+		// fmt.Println("error opening file")
 		return "", err
 	}
 
 	// iocopy
 	_, err = io.Copy(fileWriter, fh)
 	if err != nil {
-		//fmt.Println("error copying")
+		// fmt.Println("error copying")
 		return "", err
 	}
 
@@ -94,20 +94,19 @@ func postFile(filename string, targetUrl string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	resp, err := http.Post(targetUrl, contentType, bodyBuf)
-	if err != nil {
-		//fmt.Println("Post request from main.go failed.")
-		//fmt.Println(err)
+	resp, error := http.Post(targetUrl, contentType, bodyBuf)
+	if error != nil {
+		// fmt.Println("Post request from main.go failed.")
+		// fmt.Println(err)
 		return "", err
 	}
-	err = resp.Body.Close()
-	if err != nil {
-		return "", err
-	}
+
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
+	err = resp.Body.Close()
+
 	fmt.Println(resp.Status)
 	fmt.Println(string(respBody))
 
@@ -115,12 +114,12 @@ func postFile(filename string, targetUrl string) (string, error) {
 
 	err = json.Unmarshal(respBody, &data)
 	if err != nil {
-		//fmt.Println(err)
+		// fmt.Println(err)
 		return "", err
 	}
 
 	// Access the fields of the struct
-	//fmt.Printf("The CID is %s", data.CID)
+	// fmt.Printf("The CID is %s", data.CID)
 
 	return data.CID, nil
 }
